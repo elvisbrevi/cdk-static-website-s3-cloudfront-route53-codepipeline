@@ -10,8 +10,8 @@ export class CodePipelineStack extends Stack {
     
     super(scope, id, props);
 
-    const pipeline = new CodePipeline(this, 'example-pipeline', {
-      pipelineName: 'example-pipeline2',
+    const pipeline = new CodePipeline(this, id, {
+      pipelineName: id,
       synth: new ShellStep('synth-step', {
         input: CodePipelineSource.gitHub('elvisbrevi/personal-website-front', 'master'),
         installCommands: ['cd infra', 

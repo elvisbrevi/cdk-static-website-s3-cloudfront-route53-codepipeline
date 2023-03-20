@@ -63,7 +63,7 @@ export class WebAppStack extends Stack {
 
         //Deploy site to s3
         new deploy.BucketDeployment(this, "Deployment", {
-            sources: [deploy.Source.asset("./build")],
+            sources: [deploy.Source.asset("../dist")],
             destinationBucket: siteBucket,
             distribution: siteDistribution,
             distributionPaths: ["/*"]

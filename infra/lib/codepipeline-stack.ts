@@ -1,12 +1,8 @@
 "use-strict"
 import { Construct } from 'constructs';
 import { Stack, StackProps } from 'aws-cdk-lib';
-// import { LambdaHelper } from '../helpers/lambda-helper';
-// import { ApiGwHelper } from '../helpers/apigw-helper';
-// import { DynamoDbHelper } from '../helpers/dynamodb-helper';
 import { CodePipeline, CodePipelineSource, ManualApprovalStep, ShellStep } from 'aws-cdk-lib/pipelines';
-import { env } from 'process';
-import { PipelineStage } from './stage-stack';
+import { PipelineStage } from './infra-stage';
 
 export class CodePipelineStack extends Stack {
   
@@ -15,9 +11,9 @@ export class CodePipelineStack extends Stack {
     super(scope, id, props);
 
     const pipeline = new CodePipeline(this, 'example-pipeline', {
-      pipelineName: 'example-pipeline',
+      pipelineName: 'example-pipeline2',
       synth: new ShellStep('synth-step', {
-        input: CodePipelineSource.gitHub('elvisbrevi/cdk-codepipeline-template', 'master'),
+        input: CodePipelineSource.gitHub('elvisbrevi/personal-website-front', 'master'),
         installCommands: ['cd infra', 
                           'npm i -g npm@latest'],
         commands: ['npm install',
@@ -32,11 +28,11 @@ export class CodePipelineStack extends Stack {
       env: props?.env
     }));
 
-    testingStage.addPost(new ManualApprovalStep('Manual approval before production'));
+    // testingStage.addPost(new ManualApprovalStep('Manual approval before production'));
 
-    const prouctionStage = pipeline.addStage(new PipelineStage(this, 'prod', {
-      env: props?.env
-    }));
+    // const prouctionStage = pipeline.addStage(new PipelineStage(this, 'prod', {
+    //   env: props?.env
+    // }));
 
   }
 

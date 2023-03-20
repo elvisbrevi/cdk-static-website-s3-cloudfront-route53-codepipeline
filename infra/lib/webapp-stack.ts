@@ -7,6 +7,7 @@ import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as deploy from 'aws-cdk-lib/aws-s3-deployment';
+import { ViewerCertificate } from 'aws-cdk-lib/aws-cloudfront';
 
 const WEB_APP_DOMAIN = "elvisbrevi.com";
 
@@ -15,7 +16,7 @@ export class WebAppStack extends Stack {
         super(scope, id, props);
 
         //Get The Hosted Zone
-        const zone = route53.HostedZone.fromLookup(this, "Zone", {
+        const zone = route53.HostedZone.fromLookup(this, id, {
             domainName: WEB_APP_DOMAIN,
         });
         console.log(zone.zoneName);
@@ -29,24 +30,29 @@ export class WebAppStack extends Stack {
         });
 
         //Create Certificate
-        const siteCertificateArn = new acm.Certificate(this, "SiteCertificate", {
+        const siteCertificateArn = new acm.Certificate(this, id, {
             domainName: WEB_APP_DOMAIN,
+            certificateName: WEB_APP_DOMAIN,
+            subjectAlternativeNames: ['www.elvisbrevi.com'],
+            validation: acm.CertificateValidation.fromDns(zone)
             //hostedZone: zone,
             //region: "us-east-1"  //standard for acm certs
         }).certificateArn;
 
         //Create CloudFront Distribution
-        const siteDistribution = new cloudfront.CloudFrontWebDistribution(this, "SiteDistribution", {
+        const siteDistribution = new cloudfront.CloudFrontWebDistribution(this, id, {
             // aliasConfiguration: {
             //     acmCertRef: siteCertificateArn,
             //     names: [WEB_APP_DOMAIN],
             //     securityPolicy: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2019
             // },
-            
+            viewerCertificate: ViewerCertificate.fromAcmCertificate(
+                acm.Certificate.fromCertificateArn(this, id, siteCertificateArn)
+            ),
             originConfigs: [{
                 customOriginSource: {
                     domainName: siteBucket.bucketWebsiteDomainName,
-                    originProtocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY
+                    originProtocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY
                 },
                 behaviors: [{
                     isDefaultBehavior: true
@@ -55,14 +61,14 @@ export class WebAppStack extends Stack {
         });
 
         //Create A Record Custom Domain to CloudFront CDN
-        new route53.ARecord(this, "SiteRecord", {
+        new route53.ARecord(this, id, {
             recordName: WEB_APP_DOMAIN,
             target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(siteDistribution)),
             zone
         });
 
         //Deploy site to s3
-        new deploy.BucketDeployment(this, "Deployment", {
+        new deploy.BucketDeployment(this, id, {
             sources: [deploy.Source.asset("../dist")],
             destinationBucket: siteBucket,
             distribution: siteDistribution,

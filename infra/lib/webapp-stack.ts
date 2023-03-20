@@ -19,7 +19,6 @@ export class WebAppStack extends Stack {
         const zone = route53.HostedZone.fromLookup(this, id + '-hosted-zone', {
             domainName: WEB_APP_DOMAIN,
         });
-        console.log(zone.zoneName);
 
         //Create S3 Bucket for our website
         const siteBucket = new s3.Bucket(this, id + '-bucket', {
@@ -46,18 +45,18 @@ export class WebAppStack extends Stack {
             //     names: [WEB_APP_DOMAIN],
             //     securityPolicy: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2019
             // },
-            viewerCertificate: {
-                aliases: [WEB_APP_DOMAIN],
-                props: {
-                    acmCertificateArn: siteCertificateArn,
-                    sslSupportMethod: 'sni-only'
-                }
-            },
+            // viewerCertificate: {
+            //     aliases: [WEB_APP_DOMAIN],
+            //     props: {
+            //         acmCertificateArn: siteCertificateArn,
+            //         sslSupportMethod: 'sni-only'
+            //     }
+            // },
             
             
-            // ViewerCertificate.fromAcmCertificate(
-            //     acm.Certificate.fromCertificateArn(this, id, siteCertificateArn)
-            // ),
+            viewerCertificate: ViewerCertificate.fromAcmCertificate(
+                acm.Certificate.fromCertificateArn(this, 'personal-website-view-certificate', siteCertificateArn)
+            ),
             originConfigs: [{
                 customOriginSource: {
                     domainName: siteBucket.bucketWebsiteDomainName,

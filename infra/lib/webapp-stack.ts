@@ -50,6 +50,7 @@ export class WebAppStack extends Stack {
                 aliases: [WEB_APP_DOMAIN],
                 props: {
                     acmCertificateArn: siteCertificateArn,
+                    sslSupportMethod: 'sni-only'
                 }
             },
             

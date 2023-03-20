@@ -24,7 +24,7 @@ export class CodePipelineStack extends Stack {
       }),
     });
 
-    const testingStage = pipeline.addStage(new PipelineStage(this, 'test', {
+    const testingStage = pipeline.addStage(new PipelineStage(this, 'dev', {
       env: props?.env
     }));
 

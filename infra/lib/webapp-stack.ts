@@ -25,26 +25,28 @@ export class WebAppStack extends Stack {
             bucketName: WEB_APP_DOMAIN,
             websiteIndexDocument: "index.html",
             publicReadAccess: true,
+            accessControl: s3.BucketAccessControl.PUBLIC_READ,
             removalPolicy: RemovalPolicy.DESTROY,
         });
 
         //Create Certificate
+        // const siteCertificateArn = new acm.Certificate(this, id + '-certificate', {
+        //     domainName: WEB_APP_DOMAIN,
+        //     certificateName: WEB_APP_DOMAIN,
+        //     subjectAlternativeNames: ['www.elvisbrevi.com'],
+        //     validation: acm.CertificateValidation.fromDns(zone)
+        //     //hostedZone: zone,
+        //     //region: "us-east-1"  //standard for acm certs
+        // }).certificateArn;
         const siteCertificateArn = new acm.Certificate(this, id + '-certificate', {
             domainName: WEB_APP_DOMAIN,
-            certificateName: WEB_APP_DOMAIN,
             subjectAlternativeNames: ['www.elvisbrevi.com'],
-            validation: acm.CertificateValidation.fromDns(zone)
-            //hostedZone: zone,
-            //region: "us-east-1"  //standard for acm certs
+            validation: acm.CertificateValidation.fromDns(zone),
+            certificateName: WEB_APP_DOMAIN,
         }).certificateArn;
 
         //Create CloudFront Distribution
         const siteDistribution = new cloudfront.CloudFrontWebDistribution(this, id + '-cf-dist', {
-            // aliasConfiguration: {
-            //     acmCertRef: siteCertificateArn,
-            //     names: [WEB_APP_DOMAIN],
-            //     securityPolicy: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2019
-            // },
             viewerCertificate: {
                 aliases: [WEB_APP_DOMAIN],
                 props: {
@@ -76,7 +78,7 @@ export class WebAppStack extends Stack {
             sources: [deploy.Source.asset("../dist")],
             destinationBucket: siteBucket,
             distribution: siteDistribution,
-            distributionPaths: ["/*"]
+            distributionPaths: ["/*"],
         });
     }
 }

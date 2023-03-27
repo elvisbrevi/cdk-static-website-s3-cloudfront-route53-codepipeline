@@ -30,27 +30,19 @@ export class WebAppStack extends Stack {
         });
 
         //Create Certificate
-        // const siteCertificateArn = new acm.Certificate(this, id + '-certificate', {
-        //     domainName: WEB_APP_DOMAIN,
-        //     certificateName: WEB_APP_DOMAIN,
-        //     subjectAlternativeNames: ['www.elvisbrevi.com'],
-        //     validation: acm.CertificateValidation.fromDns(zone)
-        //     //hostedZone: zone,
-        //     //region: "us-east-1"  //standard for acm certs
-        // }).certificateArn;
         const siteCertificateArn = new acm.Certificate(this, id + '-certificate', {
             domainName: WEB_APP_DOMAIN,
             subjectAlternativeNames: ['www.elvisbrevi.com'],
             validation: acm.CertificateValidation.fromDns(zone),
             certificateName: WEB_APP_DOMAIN,
-        }).certificateArn;
+        });
 
         //Create CloudFront Distribution
         const siteDistribution = new cloudfront.CloudFrontWebDistribution(this, id + '-cf-dist', {
             viewerCertificate: {
                 aliases: [WEB_APP_DOMAIN],
                 props: {
-                    acmCertificateArn: siteCertificateArn,
+                    acmCertificateArn: siteCertificateArn.certificateArn,
                     sslSupportMethod: cloudfront.SSLMethod.SNI,
                     minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2019
                 }

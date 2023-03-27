@@ -45,18 +45,14 @@ export class WebAppStack extends Stack {
             //     names: [WEB_APP_DOMAIN],
             //     securityPolicy: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2019
             // },
-            // viewerCertificate: {
-            //     aliases: [WEB_APP_DOMAIN],
-            //     props: {
-            //         acmCertificateArn: siteCertificateArn,
-            //         sslSupportMethod: 'sni-only'
-            //     }
-            // },
-            
-            
-            viewerCertificate: ViewerCertificate.fromAcmCertificate(
-                acm.Certificate.fromCertificateArn(this, 'personal-website-view-certificate', siteCertificateArn)
-            ),
+            viewerCertificate: {
+                aliases: [WEB_APP_DOMAIN],
+                props: {
+                    acmCertificateArn: siteCertificateArn,
+                    sslSupportMethod: cloudfront.SSLMethod.SNI,
+                    minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2019
+                }
+            },
             originConfigs: [{
                 customOriginSource: {
                     domainName: siteBucket.bucketWebsiteDomainName,

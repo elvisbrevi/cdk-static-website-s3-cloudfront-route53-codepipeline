@@ -67,7 +67,7 @@ export class WebAppStack extends Stack {
 
         const redirectSiteDistribution = new cloudfront.CloudFrontWebDistribution(this, id + '-redirect-cf-dist', {
             viewerCertificate: {
-                aliases: [WEB_APP_DOMAIN],
+                aliases: ['www.' + WEB_APP_DOMAIN],
                 props: {
                     acmCertificateArn: siteCertificateArn.certificateArn,
                     sslSupportMethod: cloudfront.SSLMethod.SNI,
@@ -91,7 +91,7 @@ export class WebAppStack extends Stack {
             target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(siteDistribution))
         });
 
-        new route53.ARecord(this, id + '-www-aRecord', {
+        new route53.ARecord(this, id + '-redirect-aRecord', {
             zone: zone,
             recordName: "www." + WEB_APP_DOMAIN,
             target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(redirectSiteDistribution)),

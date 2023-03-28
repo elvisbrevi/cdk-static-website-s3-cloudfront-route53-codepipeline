@@ -25,12 +25,12 @@ export class WebAppStack extends Stack {
         });
 
         // Crear S3 Bucket para redireccionamiento
-        const redirectBucket = new s3.Bucket(this, id + '-redirect-bucket', {
-            bucketName: 'www.' + WEB_APP_DOMAIN,
-            websiteRedirect: { hostName: WEB_APP_DOMAIN },
-            removalPolicy: RemovalPolicy.DESTROY,
-            autoDeleteObjects: true,
-        });
+        // const redirectBucket = new s3.Bucket(this, id + '-redirect-bucket', {
+        //     bucketName: 'www.' + WEB_APP_DOMAIN,
+        //     websiteRedirect: { hostName: WEB_APP_DOMAIN },
+        //     removalPolicy: RemovalPolicy.DESTROY,
+        //     autoDeleteObjects: true,
+        // });
 
         //Get The Hosted Zone
         const zone = route53.HostedZone.fromLookup(this, id + '-hosted-zone', {
@@ -65,24 +65,24 @@ export class WebAppStack extends Stack {
             }]
         });
 
-        const redirectSiteDistribution = new cloudfront.CloudFrontWebDistribution(this, id + '-redirect-cf-dist', {
-            viewerCertificate: {
-                aliases: [WEB_APP_DOMAIN],
-                props: {
-                    acmCertificateArn: siteCertificateArn.certificateArn,
-                    sslSupportMethod: cloudfront.SSLMethod.SNI,
-                    minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
-                }
-            },
-            originConfigs: [{
-                s3OriginSource: {
-                    s3BucketSource: redirectBucket,
-                }, 
-                behaviors: [{
-                    isDefaultBehavior: true
-                }]
-            }]
-        });
+        // const redirectSiteDistribution = new cloudfront.CloudFrontWebDistribution(this, id + '-redirect-cf-dist', {
+        //     viewerCertificate: {
+        //         aliases: [WEB_APP_DOMAIN],
+        //         props: {
+        //             acmCertificateArn: siteCertificateArn.certificateArn,
+        //             sslSupportMethod: cloudfront.SSLMethod.SNI,
+        //             minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
+        //         }
+        //     },
+        //     originConfigs: [{
+        //         s3OriginSource: {
+        //             s3BucketSource: redirectBucket,
+        //         }, 
+        //         behaviors: [{
+        //             isDefaultBehavior: true
+        //         }]
+        //     }]
+        // });
 
         //Create A Record Custom Domain to CloudFront CDN
         new route53.ARecord(this, id + '-aRecord', {
@@ -91,11 +91,11 @@ export class WebAppStack extends Stack {
             target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(siteDistribution)),
         });
 
-        new route53.ARecord(this, id + '-www-aRecord', {
-            zone: zone,
-            recordName: "www." + WEB_APP_DOMAIN,
-            target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(redirectSiteDistribution)),
-        });
+        // new route53.ARecord(this, id + '-www-aRecord', {
+        //     zone: zone,
+        //     recordName: "www." + WEB_APP_DOMAIN,
+        //     target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(redirectSiteDistribution)),
+        // });
 
         // Deploy the React app from the 'build' directory to the S3 bucket
         new s3deploy.BucketDeployment(this, id + '-bucket-deployment', {

@@ -7,7 +7,6 @@ import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
-import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 
 const WEB_APP_DOMAIN = "elvisbrevi.com";
 
@@ -19,8 +18,8 @@ export class WebAppStack extends Stack {
         const siteBucket = new s3.Bucket(this, id + '-bucket', {
             bucketName: WEB_APP_DOMAIN,
             websiteIndexDocument: "index.html",
-            // publicReadAccess: true,
-            // accessControl: s3.BucketAccessControl.PUBLIC_READ,
+            publicReadAccess: true,
+            accessControl: s3.BucketAccessControl.PUBLIC_READ,
             removalPolicy: RemovalPolicy.DESTROY,
         });
 

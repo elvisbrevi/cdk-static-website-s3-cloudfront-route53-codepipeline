@@ -23,6 +23,13 @@ export class WebAppStack extends Stack {
             removalPolicy: RemovalPolicy.DESTROY,
         });
 
+        // Crear S3 Bucket para redireccionamiento
+        const redirectBucket = new s3.Bucket(this, id + '-redirect-bucket', {
+            bucketName: 'www.' + WEB_APP_DOMAIN,
+            websiteRedirect: { hostName: WEB_APP_DOMAIN },
+            removalPolicy: RemovalPolicy.DESTROY,
+        });
+
         //Get The Hosted Zone
         const zone = route53.HostedZone.fromLookup(this, id + '-hosted-zone', {
             domainName: WEB_APP_DOMAIN,
@@ -38,24 +45,37 @@ export class WebAppStack extends Stack {
 
         //Create CloudFront Distribution
         const siteDistribution = new cloudfront.CloudFrontWebDistribution(this, id + '-cf-dist', {
-            // defaultBehavior: {
-            //     origin: new origins.S3Origin(siteBucket),
-            //     viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-            // },
-            // defaultRootObject: 'index.html',
-            // domainNames: [WEB_APP_DOMAIN],
             viewerCertificate: {
                 aliases: [WEB_APP_DOMAIN],
                 props: {
                     acmCertificateArn: siteCertificateArn.certificateArn,
                     sslSupportMethod: cloudfront.SSLMethod.SNI,
-                    minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2019,
+                    minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
                 }
             },
             originConfigs: [{
                 s3OriginSource: {
                     s3BucketSource: siteBucket,
-                },
+                }, 
+                behaviors: [{
+                    isDefaultBehavior: true
+                }]
+            }]
+        });
+
+        const redirectSiteDistribution = new cloudfront.CloudFrontWebDistribution(this, id + '-cf-dist', {
+            viewerCertificate: {
+                aliases: [WEB_APP_DOMAIN],
+                props: {
+                    acmCertificateArn: siteCertificateArn.certificateArn,
+                    sslSupportMethod: cloudfront.SSLMethod.SNI,
+                    minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
+                }
+            },
+            originConfigs: [{
+                s3OriginSource: {
+                    s3BucketSource: redirectBucket,
+                }, 
                 behaviors: [{
                     isDefaultBehavior: true
                 }]
@@ -67,9 +87,12 @@ export class WebAppStack extends Stack {
             zone: zone,
             recordName: WEB_APP_DOMAIN,
             target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(siteDistribution)),
-            // recordName: WEB_APP_DOMAIN,
-            // target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(siteDistribution)),
-            // zone
+        });
+
+        new route53.ARecord(this, id + '-www-aRecord', {
+            zone: zone,
+            recordName: "www." + WEB_APP_DOMAIN,
+            target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(redirectSiteDistribution)),
         });
 
         // Deploy the React app from the 'build' directory to the S3 bucket
@@ -79,13 +102,5 @@ export class WebAppStack extends Stack {
             distribution: siteDistribution,
             distributionPaths: ['/*'],
         });
-
-        //Deploy site to s3
-        // new deploy.BucketDeployment(this, id + '-bucket-deployment', {
-        //     sources: [deploy.Source.asset("../dist")],
-        //     destinationBucket: siteBucket,
-        //     distribution: siteDistribution,
-        //     distributionPaths: ["/*"],
-        // });
     }
 }

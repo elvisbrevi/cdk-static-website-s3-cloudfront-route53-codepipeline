@@ -6,8 +6,8 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as targets from 'aws-cdk-lib/aws-route53-targets';
-import * as deploy from 'aws-cdk-lib/aws-s3-deployment';
-import { ViewerCertificate } from 'aws-cdk-lib/aws-cloudfront';
+import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
+import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 
 const WEB_APP_DOMAIN = "elvisbrevi.com";
 
@@ -15,18 +15,18 @@ export class WebAppStack extends Stack {
     constructor(scope: Construct, id: string, stageName: string, props?: StackProps) {
         super(scope, id, props);
 
-        //Get The Hosted Zone
-        const zone = route53.HostedZone.fromLookup(this, id + '-hosted-zone', {
-            domainName: WEB_APP_DOMAIN,
-        });
-
         //Create S3 Bucket for our website
         const siteBucket = new s3.Bucket(this, id + '-bucket', {
             bucketName: WEB_APP_DOMAIN,
             websiteIndexDocument: "index.html",
-            publicReadAccess: true,
-            accessControl: s3.BucketAccessControl.PUBLIC_READ,
+            // publicReadAccess: true,
+            // accessControl: s3.BucketAccessControl.PUBLIC_READ,
             removalPolicy: RemovalPolicy.DESTROY,
+        });
+
+        //Get The Hosted Zone
+        const zone = route53.HostedZone.fromLookup(this, id + '-hosted-zone', {
+            domainName: WEB_APP_DOMAIN,
         });
 
         //Create Certificate
@@ -39,18 +39,23 @@ export class WebAppStack extends Stack {
 
         //Create CloudFront Distribution
         const siteDistribution = new cloudfront.CloudFrontWebDistribution(this, id + '-cf-dist', {
+            // defaultBehavior: {
+            //     origin: new origins.S3Origin(siteBucket),
+            //     viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            // },
+            // defaultRootObject: 'index.html',
+            // domainNames: [WEB_APP_DOMAIN],
             viewerCertificate: {
                 aliases: [WEB_APP_DOMAIN],
                 props: {
                     acmCertificateArn: siteCertificateArn.certificateArn,
                     sslSupportMethod: cloudfront.SSLMethod.SNI,
-                    minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2019
+                    minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2019,
                 }
             },
             originConfigs: [{
-                customOriginSource: {
-                    domainName: siteBucket.bucketWebsiteDomainName,
-                    originProtocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY
+                s3OriginSource: {
+                    s3BucketSource: siteBucket,
                 },
                 behaviors: [{
                     isDefaultBehavior: true
@@ -60,17 +65,28 @@ export class WebAppStack extends Stack {
 
         //Create A Record Custom Domain to CloudFront CDN
         new route53.ARecord(this, id + '-aRecord', {
+            zone: zone,
             recordName: WEB_APP_DOMAIN,
             target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(siteDistribution)),
-            zone
+            // recordName: WEB_APP_DOMAIN,
+            // target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(siteDistribution)),
+            // zone
+        });
+
+        // Deploy the React app from the 'build' directory to the S3 bucket
+        new s3deploy.BucketDeployment(this, id + '-bucket-deployment', {
+            sources: [s3deploy.Source.asset('../dist')], // Adjust the path if necessary
+            destinationBucket: siteBucket,
+            distribution: siteDistribution,
+            distributionPaths: ['/*'],
         });
 
         //Deploy site to s3
-        new deploy.BucketDeployment(this, id + '-bucket-deployment', {
-            sources: [deploy.Source.asset("../dist")],
-            destinationBucket: siteBucket,
-            distribution: siteDistribution,
-            distributionPaths: ["/*"],
-        });
+        // new deploy.BucketDeployment(this, id + '-bucket-deployment', {
+        //     sources: [deploy.Source.asset("../dist")],
+        //     destinationBucket: siteBucket,
+        //     distribution: siteDistribution,
+        //     distributionPaths: ["/*"],
+        // });
     }
 }

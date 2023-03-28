@@ -63,7 +63,7 @@ export class WebAppStack extends Stack {
             }]
         });
 
-        const redirectSiteDistribution = new cloudfront.CloudFrontWebDistribution(this, id + '-cf-dist', {
+        const redirectSiteDistribution = new cloudfront.CloudFrontWebDistribution(this, id + '-redirect-cf-dist', {
             viewerCertificate: {
                 aliases: [WEB_APP_DOMAIN],
                 props: {

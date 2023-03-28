@@ -21,6 +21,7 @@ export class WebAppStack extends Stack {
             publicReadAccess: true,
             accessControl: s3.BucketAccessControl.PUBLIC_READ,
             removalPolicy: RemovalPolicy.DESTROY,
+            autoDeleteObjects: true,
         });
 
         // Crear S3 Bucket para redireccionamiento
@@ -28,6 +29,7 @@ export class WebAppStack extends Stack {
             bucketName: 'www.' + WEB_APP_DOMAIN,
             websiteRedirect: { hostName: WEB_APP_DOMAIN },
             removalPolicy: RemovalPolicy.DESTROY,
+            autoDeleteObjects: true,
         });
 
         //Get The Hosted Zone

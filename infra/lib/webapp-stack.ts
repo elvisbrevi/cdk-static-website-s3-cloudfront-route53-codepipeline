@@ -88,7 +88,7 @@ export class WebAppStack extends Stack {
         new route53.ARecord(this, id + '-aRecord', {
             zone: zone,
             recordName: WEB_APP_DOMAIN,
-            target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(siteDistribution)),
+            target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(siteDistribution))
         });
 
         // new route53.ARecord(this, id + '-www-aRecord', {
@@ -96,14 +96,13 @@ export class WebAppStack extends Stack {
         //     recordName: "www." + WEB_APP_DOMAIN,
         //     target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(redirectSiteDistribution)),
         // });
-        
 
         // Deploy the React app from the 'build' directory to the S3 bucket
         new s3deploy.BucketDeployment(this, id + '-bucket-deployment', {
             sources: [s3deploy.Source.asset('../dist')], // Adjust the path if necessary
             destinationBucket: siteBucket,
             distribution: siteDistribution,
-            distributionPaths: ['/*'],
+            distributionPaths: ['/*']
         });
     }
 }

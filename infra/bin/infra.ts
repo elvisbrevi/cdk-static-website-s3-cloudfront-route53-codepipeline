@@ -9,6 +9,6 @@ const env = {
 }; 
 const app = new cdk.App();
 
-new CodePipelineStack(app, 'personal-website', { env: env });
+new CodePipelineStack(app, 'pipeline-personal-website', { env: env });
 
 app.synth();

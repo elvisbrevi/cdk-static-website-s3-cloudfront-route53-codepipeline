@@ -7,7 +7,6 @@ import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
-import { OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
 
 const WEB_APP_DOMAIN = "elvisbrevi.com";
 
@@ -28,7 +27,7 @@ export class WebAppStack extends Stack {
         // Crear S3 Bucket para redireccionamiento
         const redirectBucket = new s3.Bucket(this, id + '-redirect-bucket', {
             bucketName: 'www.' + WEB_APP_DOMAIN,
-            websiteRedirect: { hostName: WEB_APP_DOMAIN },
+            websiteRedirect: { hostName: WEB_APP_DOMAIN, protocol: s3.RedirectProtocol.HTTPS },
             removalPolicy: RemovalPolicy.DESTROY,
             autoDeleteObjects: true,
         });
@@ -45,7 +44,7 @@ export class WebAppStack extends Stack {
             validation: acm.CertificateValidation.fromDns(zone),
             certificateName: WEB_APP_DOMAIN,
         });
-
+        
         //Create CloudFront Distribution
         const siteDistribution = new cloudfront.CloudFrontWebDistribution(this, id + '-cf-dist', {
             viewerCertificate: {
@@ -58,17 +57,15 @@ export class WebAppStack extends Stack {
             },
             originConfigs: [{
                 s3OriginSource: {
+
                     s3BucketSource: siteBucket,
-                }, 
+                },
                 behaviors: [{
                     isDefaultBehavior: true
                 }]
             }]
         });
-
-        const oin = new OriginAccessIdentity(this, id + 'CF-OAI');
-        redirectBucket.grantRead(oin);
-
+        
         const redirectSiteDistribution = new cloudfront.CloudFrontWebDistribution(this, id + '-redirect-cf-dist', {
             viewerCertificate: {
                 aliases: ['www.' + WEB_APP_DOMAIN],
@@ -78,10 +75,10 @@ export class WebAppStack extends Stack {
                     minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
                 }
             },
+            defaultRootObject: '',
             originConfigs: [{
                 s3OriginSource: {
-                    s3BucketSource: redirectBucket,
-                    originAccessIdentity: oin
+                    s3BucketSource: redirectBucket
                 }, 
                 behaviors: [{
                     isDefaultBehavior: true

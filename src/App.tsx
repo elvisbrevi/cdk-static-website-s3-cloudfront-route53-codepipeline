@@ -16,17 +16,15 @@ function App() {
     <Router>
       <div className={`App ${darkMode ? "dark" : ""}`}>
         <header 
-          className={`bg-primary text-white p-4 flex justify-between items-center ${
-            darkMode ? "dark:bg-dark-backgroundColor-primary" : ""
-          }`}
+          className={`bg-primary text-white p-4 flex justify-between items-center 
+          ${darkMode ? "dark:bg-dark-backgroundColor-primary" : ""}`}
         >
           <button
             className="text-secondary font-bold text-2xl focus:outline-none"
-            onClick={toggleDarkMode}
-          >
+            onClick={toggleDarkMode}>
             {darkMode ? "🌞" : "🌙"}
           </button>
-          <h2 className="text-2xl">Elvis Brevi</h2>
+          <h2 className="delicious-handrawn">Elvis Brevi</h2>
           <nav>
             <ul className="flex gap-4">
               <li>

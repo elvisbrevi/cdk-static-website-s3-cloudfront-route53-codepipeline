@@ -2,11 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Header.css';
 import { Link } from 'react-router-dom';
 
-interface Props {
-  toggleMenu: () => void;
-}
-
-const Header: React.FC<Props> = ({ toggleMenu }) => {
+const Header: React.FC = () => {
   const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
 
   useEffect(() => {

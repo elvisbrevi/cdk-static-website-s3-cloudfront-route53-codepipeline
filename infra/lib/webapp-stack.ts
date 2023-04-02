@@ -23,12 +23,6 @@ export class WebAppStack extends Stack {
             websiteIndexDocument: 'index.html',
         });
 
-        new s3deploy.BucketDeployment(this, `BucketDeployment-${id}`, {
-            sources: [s3deploy.Source.asset('../dist')], // Adjust the path if necessary
-            destinationBucket: staticWebsiteBucket,
-            distributionPaths: ['/*']
-        });
-
         //Get The Hosted Zone
         const hostedZone = route53.HostedZone.fromLookup(this, `HostedZone-${id}`, {
             domainName: DOMAIN_NAME,
@@ -85,6 +79,13 @@ export class WebAppStack extends Stack {
             zone: hostedZone,
             target: route53.RecordTarget.fromAlias(new CloudFrontTarget(cloudFrontDistribution)),
             recordName: WWW_DOMAIN_NAME,
+        });
+
+        new s3deploy.BucketDeployment(this, `BucketDeployment-${id}`, {
+            sources: [s3deploy.Source.asset('../dist')], // Adjust the path if necessary
+            destinationBucket: staticWebsiteBucket,
+            distributionPaths: ['/*'], 
+            distribution: cloudFrontDistribution,
         });
     }
 }

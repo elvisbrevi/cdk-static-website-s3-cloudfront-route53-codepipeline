@@ -3,10 +3,34 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 2rem;
+  }
+
+  .about-image-container {
+    font-size: 1.1rem;
+    width: 60%;
+    text-align: center;
+    background: var(--accent-color);
+    margin: 2rem;
+    padding: 1rem;
+    border: .3rem solid var(--light-color);
+    border-radius: .5rem;
   }
   
   .about-title {
     font-size: 2rem;
-    margin-bottom: 1rem;
+    position: absolute;
+    margin-top: -3rem;
+  }
+
+  svg {
+    width: 100%;
+    height: auto;
+  }
+
+  @media (max-width: 768px) {
+    .about-image-container {
+      width: 100%;
+    }
   }
   

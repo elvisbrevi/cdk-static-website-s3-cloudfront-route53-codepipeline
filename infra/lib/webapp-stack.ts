@@ -1,4 +1,4 @@
-"use-strict";
+"use strict";
 import { Construct } from 'constructs';
 import { RemovalPolicy, Stack, StackProps } from "aws-cdk-lib";
 import * as route53 from 'aws-cdk-lib/aws-route53';
@@ -28,7 +28,7 @@ export class WebAppStack extends Stack {
             domainName: DOMAIN_NAME,
         });
 
-        // Create the HTTPS certificate (⚠️ must be in region us-east-1 ⚠️)
+        // Create the HTTPS certificate
         const httpsCertificate = new acm.Certificate(this, `HttpsCertificate-${id}`, {
             domainName: DOMAIN_NAME,
             subjectAlternativeNames: [WWW_DOMAIN_NAME],
@@ -40,51 +40,28 @@ export class WebAppStack extends Stack {
             defaultBehavior: {
                 origin: new S3Origin(staticWebsiteBucket, {}),
                 viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-            //responseHeadersPolicy: { responseHeadersPolicyId: '67f7725c-6f97-4210-82d7-5512b31e9d03' },
             },
             domainNames: [DOMAIN_NAME, WWW_DOMAIN_NAME],
             certificate: httpsCertificate
         });
-        
-        //Create CloudFront Distribution
-        // const siteDistribution = new cloudfront.CloudFrontWebDistribution(this, id + '-cf-dist', {
-        //     viewerCertificate: {
-        //         aliases: [WEB_APP_DOMAIN],
-        //         props: {
-        //             acmCertificateArn: siteCertificateArn.certificateArn,
-        //             sslSupportMethod: cloudfront.SSLMethod.SNI,
-        //             minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
-        //         }
-        //     },
-        //     originConfigs: [{
-        //         s3OriginSource: {
-
-        //             s3BucketSource: siteBucket,
-        //         },
-        //         behaviors: [{
-        //             isDefaultBehavior: true
-        //         }]
-        //     }]
-        // });
         
         // Add DNS records to the hosted zone to redirect from the domain name to the CloudFront distribution
         new route53.ARecord(this, `CloudFrontRedirect-${id}`, {
             zone: hostedZone,
             target: route53.RecordTarget.fromAlias(new CloudFrontTarget(cloudFrontDistribution)),
             recordName: DOMAIN_NAME, 
-            deleteExisting: true,
         });
         
-        // Same from www. sub-domain
+        // Same from www.sub-domain
         new route53.ARecord(this, `CloudFrontWWWRedirect-${id}`, {
             zone: hostedZone,
             target: route53.RecordTarget.fromAlias(new CloudFrontTarget(cloudFrontDistribution)),
             recordName: WWW_DOMAIN_NAME,
-            deleteExisting: true,
         });
 
+        // Deploy the website to the hosting bucket
         new s3deploy.BucketDeployment(this, `BucketDeployment-${id}`, {
-            sources: [s3deploy.Source.asset('../dist')], // Adjust the path if necessary
+            sources: [s3deploy.Source.asset('../dist')], 
             destinationBucket: staticWebsiteBucket,
             distributionPaths: ['/*'], 
             distribution: cloudFrontDistribution,

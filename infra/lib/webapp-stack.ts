@@ -5,7 +5,6 @@ import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
-import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
@@ -21,6 +20,7 @@ export class WebAppStack extends Stack {
         const staticWebsiteBucket = new s3.Bucket(this, `WebsiteBucket-${id}`, {
             publicReadAccess: true,
             websiteIndexDocument: 'index.html',
+            removalPolicy: RemovalPolicy.DESTROY,
         });
 
         //Get The Hosted Zone
@@ -43,7 +43,7 @@ export class WebAppStack extends Stack {
             //responseHeadersPolicy: { responseHeadersPolicyId: '67f7725c-6f97-4210-82d7-5512b31e9d03' },
             },
             domainNames: [DOMAIN_NAME, WWW_DOMAIN_NAME],
-            certificate: httpsCertificate,
+            certificate: httpsCertificate
         });
         
         //Create CloudFront Distribution
@@ -71,7 +71,8 @@ export class WebAppStack extends Stack {
         new route53.ARecord(this, `CloudFrontRedirect-${id}`, {
             zone: hostedZone,
             target: route53.RecordTarget.fromAlias(new CloudFrontTarget(cloudFrontDistribution)),
-            recordName: DOMAIN_NAME,
+            recordName: DOMAIN_NAME, 
+            deleteExisting: true,
         });
         
         // Same from www. sub-domain
@@ -79,6 +80,7 @@ export class WebAppStack extends Stack {
             zone: hostedZone,
             target: route53.RecordTarget.fromAlias(new CloudFrontTarget(cloudFrontDistribution)),
             recordName: WWW_DOMAIN_NAME,
+            deleteExisting: true,
         });
 
         new s3deploy.BucketDeployment(this, `BucketDeployment-${id}`, {
@@ -86,6 +88,7 @@ export class WebAppStack extends Stack {
             destinationBucket: staticWebsiteBucket,
             distributionPaths: ['/*'], 
             distribution: cloudFrontDistribution,
+            retainOnDelete: false,
         });
     }
 }

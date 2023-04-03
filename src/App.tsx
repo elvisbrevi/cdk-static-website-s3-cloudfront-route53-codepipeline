@@ -5,6 +5,7 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import MiniProjectsPage from './pages/MiniProjectsPage';
 import BlogPage from './pages/BlogPage';
+import './App.css';
 
 const App: React.FC = () => {
   return (

@@ -14,8 +14,7 @@ export class CodePipelineStack extends Stack {
       pipelineName: id,
       synth: new ShellStep('synth-step', {
         input: CodePipelineSource.gitHub('elvisbrevi/personal-website-front', 'master'),
-        installCommands: ['npm run build',
-                          'cd infra', 
+        installCommands: ['cd infra', 
                           'npm i -g npm@latest'],
         commands: ['npm install',
                    'npm ci',

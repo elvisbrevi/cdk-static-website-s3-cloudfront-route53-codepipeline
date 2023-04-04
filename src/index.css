@@ -26,6 +26,14 @@ header {
   position: relative;
 }
 
+.post-title-font {
+  font-family: 'Koh Santepheap', cursive;
+}
+
+.post-description-font {
+  font-family: 'Noto Serif JP', serif;
+}
+
 .menu-btn {
   cursor: pointer;
   display: none;

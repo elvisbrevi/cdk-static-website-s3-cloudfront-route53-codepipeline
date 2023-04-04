@@ -3,7 +3,7 @@
     align-items: center;
     background-color: var(--secondary-color);
     color: white;
-    padding: 1rem;
+    padding: .5rem;
   }
   
   .header-menu {
@@ -24,6 +24,7 @@
     text-decoration: none;
     padding: 0.5rem;
     text-align: center;
+    font-size: 1.3rem;
   }
 
   #title {

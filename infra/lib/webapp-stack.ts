@@ -18,13 +18,10 @@ export class WebAppStack extends Stack {
 
         // Create the bucket hosting the website
         const staticWebsiteBucket = new s3.Bucket(this, `WebsiteBucket-${id}`, {
+            publicReadAccess: true,
             websiteIndexDocument: 'index.html',
             removalPolicy: RemovalPolicy.DESTROY,
         });
-
-        // Create the CloudFront Origin Access Identity
-        const oin = new cloudfront.OriginAccessIdentity(this, `CloudFrontOAI-${id}`);
-        staticWebsiteBucket.grantRead(oin);
 
         //Get The Hosted Zone
         const hostedZone = route53.HostedZone.fromLookup(this, `HostedZone-${id}`, {
@@ -41,9 +38,7 @@ export class WebAppStack extends Stack {
         // Create the CloudFront distribution linked to the website hosting bucket and the HTTPS certificate
         const cloudFrontDistribution = new cloudfront.Distribution(this, `CloudFrontDistribution-${id}`, {
             defaultBehavior: {
-                origin: new S3Origin(staticWebsiteBucket, {
-                    originAccessIdentity: oin,
-                }),
+                origin: new S3Origin(staticWebsiteBucket),
                 viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             },
             domainNames: [DOMAIN_NAME, WWW_DOMAIN_NAME],

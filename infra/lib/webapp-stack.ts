@@ -23,7 +23,7 @@ export class WebAppStack extends Stack {
         });
 
         // Create the CloudFront Origin Access Identity
-        const oin = new cloudfront.OriginAccessIdentity(scope, `CloudFrontOAI-${id}`);
+        const oin = new cloudfront.OriginAccessIdentity(this, `CloudFrontOAI-${id}`);
         staticWebsiteBucket.grantRead(oin);
 
         //Get The Hosted Zone

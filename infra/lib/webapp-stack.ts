@@ -72,5 +72,6 @@ export class WebAppStack extends Stack {
             distribution: cloudFrontDistribution,
             retainOnDelete: false,
         });
+        
     }
 }

@@ -33,6 +33,7 @@ export class WebAppStack extends Stack {
             domainName: DOMAIN_NAME,
             subjectAlternativeNames: [WWW_DOMAIN_NAME],
             validation: acm.CertificateValidation.fromDns(hostedZone),
+            certificateName: `Certificate-${id}`,
         });
 
         // Create the CloudFront distribution linked to the website hosting bucket and the HTTPS certificate

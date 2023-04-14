@@ -6,6 +6,7 @@ import ContactPage from './pages/ContactPage';
 import MiniProjectsPage from './pages/MiniProjectsPage';
 import BlogPage from './pages/BlogPage';
 import './App.css';
+import PostEditor from './pages/PostEditor';
 
 const App: React.FC = () => {
   return (
@@ -18,6 +19,7 @@ const App: React.FC = () => {
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/mini-projects" element={<MiniProjectsPage />} />
+          <Route path="/editor" element={<PostEditor />} />
         </Routes>
       </main>
     </Router>

@@ -16,7 +16,7 @@ const Header: React.FC = () => {
       <div className={`header-menu ${windowWidth <= 768 ? 'responsive' : ''}`}>
         <Link to="/"><p id="title" className='anton-font'>Elvis Brevi</p></Link>
         <Link to="/blog">Blog</Link>
-        <Link to="/mini-projects">Mini Projects</Link>
+        {/* <Link to="/mini-projects">Mini Projects</Link> */}
         <Link to="/contact">Contact</Link>
       </div>
     </nav>

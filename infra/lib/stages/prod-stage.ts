@@ -1,6 +1,6 @@
 import { StackProps, Stage } from "aws-cdk-lib";
 import { Construct } from "constructs";
-import { StorageStack } from "../stacks/storage-stack";
+import { WebSiteStack } from "../stacks/website-stack";
 
 export class WebSiteStage extends Stage {
 
@@ -14,7 +14,6 @@ export class WebSiteStage extends Stage {
             }
         };
 
-        new StorageStack(this, 'blog-storage', stageName, commonProps);
+        new WebSiteStack(this, 'blog-website', stageName,commonProps);
     }
-    
 }

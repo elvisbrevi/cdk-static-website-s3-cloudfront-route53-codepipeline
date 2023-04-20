@@ -7,8 +7,9 @@ const env = {
   account: process.env.CDK_DEFAULT_ACCOUNT, 
   region: 'us-east-1' 
 }; 
+
 const app = new cdk.App();
 
-new PipelineStack(app, 'pipeline-blog-frontend', { env: env, stackName: 'prod' });
+new PipelineStack(app, 'pipeline-blog-frontend', { env: env });
 
 app.synth();

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { CodePipelineStack } from '../lib/codepipeline-stack';
+import { PipelineStack } from '../lib/stacks/pipeline-stack';
 
 const env = { 
   account: process.env.CDK_DEFAULT_ACCOUNT, 
@@ -9,6 +9,6 @@ const env = {
 }; 
 const app = new cdk.App();
 
-new CodePipelineStack(app, 'pipeline-personal-website', { env: env });
+new PipelineStack(app, 'pipeline-blog-frontend', { env: env, stackName: 'prod' });
 
 app.synth();

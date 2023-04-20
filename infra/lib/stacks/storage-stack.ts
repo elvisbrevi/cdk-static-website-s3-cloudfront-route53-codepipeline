@@ -12,7 +12,8 @@ import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
 const DOMAIN_NAME = "elvisbrevi.com";
 const WWW_DOMAIN_NAME = `www.${DOMAIN_NAME}`;
 
-export class WebAppStack extends Stack {
+export class StorageStack extends Stack {
+
     constructor(scope: Construct, id: string, stageName: string, props?: StackProps) {
         super(scope, id, props);
 

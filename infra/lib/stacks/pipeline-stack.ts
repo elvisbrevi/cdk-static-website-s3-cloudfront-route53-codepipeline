@@ -1,10 +1,10 @@
 "use strict"
 import { Construct } from 'constructs';
 import { Stack, StackProps } from 'aws-cdk-lib';
-import { CodePipeline, CodePipelineSource, ManualApprovalStep, ShellStep } from 'aws-cdk-lib/pipelines';
-import { PipelineStage } from './infra-stage';
+import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
+import { ProdStage } from '../stages/prod-stage';
 
-export class CodePipelineStack extends Stack {
+export class PipelineStack extends Stack {
   
   constructor(scope: Construct, id: string, props?: StackProps) {
     
@@ -24,7 +24,7 @@ export class CodePipelineStack extends Stack {
       }),
     });
 
-    pipeline.addStage(new PipelineStage(this, 'prod', {
+    pipeline.addStage(new ProdStage(this, 'prod', {
       env: props?.env
     }));
 

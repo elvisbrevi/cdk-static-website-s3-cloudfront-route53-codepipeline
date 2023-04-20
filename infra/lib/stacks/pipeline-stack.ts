@@ -2,7 +2,7 @@
 import { Construct } from 'constructs';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
-import { ProdStage } from '../stages/prod-stage';
+import { WebSiteStage } from '../stages/prod-stage';
 
 export class PipelineStack extends Stack {
   
@@ -24,7 +24,7 @@ export class PipelineStack extends Stack {
       }),
     });
 
-    pipeline.addStage(new ProdStage(this, 'prod', {
+    pipeline.addStage(new WebSiteStage(this, 'prod', {
       env: props?.env
     }));
 

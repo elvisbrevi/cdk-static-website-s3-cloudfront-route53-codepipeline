@@ -2,7 +2,7 @@ import { StackProps, Stage } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { StorageStack } from "../stacks/storage-stack";
 
-export class ProdStage extends Stage {
+export class WebSiteStage extends Stage {
 
     constructor(scope: Construct, stageName: string, props?: StackProps) {
         super(scope, stageName, props);

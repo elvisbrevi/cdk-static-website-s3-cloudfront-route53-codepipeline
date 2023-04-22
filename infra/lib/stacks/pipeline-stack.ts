@@ -24,27 +24,7 @@ export class PipelineStack extends Stack {
       }),
     });
 
-
-    const stageOpts = {  
-      pre: [
-        new ShellStep('vite-build-step', {
-          installCommands: ['npm i -g npm@latest'],
-          commands: ['npm install typescript -g',
-                     'tsc && vite build']
-        })
-      ]
-    };
-
-    pipeline.addStage(
-      new WebSiteStage(
-        this, 
-        'prod', 
-        {
-          env: props?.env
-        }
-      ),
-      stageOpts
-    );
+    pipeline.addStage(new WebSiteStage(this, 'prod', { env: props?.env }));
 
   }
 

@@ -24,9 +24,27 @@ export class PipelineStack extends Stack {
       }),
     });
 
-    pipeline.addStage(new WebSiteStage(this, 'prod', {
-      env: props?.env
-    }));
+
+    const stageOpts = {  
+      pre: [
+        new ShellStep('vite-build-step', {
+          installCommands: ['npm i -g npm@latest'],
+          commands: ['tsc && vite build'],
+          primaryOutputDirectory: 'cdk.out'
+        })
+      ]
+    };
+
+    pipeline.addStage(
+      new WebSiteStage(
+        this, 
+        'prod', 
+        {
+          env: props?.env
+        }
+      ),
+      stageOpts
+    );
 
   }
 

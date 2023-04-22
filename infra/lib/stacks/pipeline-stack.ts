@@ -29,7 +29,7 @@ export class PipelineStack extends Stack {
       pre: [
         new ShellStep('vite-build-step', {
           installCommands: ['npm i -g npm@latest'],
-          commands: ['ls',
+          commands: ['npm install typescript -g',
                      'tsc && vite build']
         })
       ]

@@ -29,8 +29,8 @@ export class PipelineStack extends Stack {
       pre: [
         new ShellStep('vite-build-step', {
           installCommands: ['npm i -g npm@latest'],
-          commands: ['tsc && vite build'],
-          primaryOutputDirectory: 'cdk.out'
+          commands: ['ls',
+                     'tsc && vite build']
         })
       ]
     };

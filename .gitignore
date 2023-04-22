@@ -11,3 +11,5 @@ infra/node_modules
 infra/.cdk.staging
 cdk.out
 infra/cdk.out
+.DS_Store
+.DS_Store

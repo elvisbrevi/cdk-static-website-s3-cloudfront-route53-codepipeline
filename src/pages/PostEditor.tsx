@@ -1,8 +1,16 @@
 import React, { useEffect } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import ApiCall from '../components/ApiCall/ApiCall';
+import { Navigate } from 'react-router-dom';
 
 const PostEditor: React.FC = () => {
+
+  console.log(localStorage.getItem('token'));
+  if (localStorage.getItem('token') == '' || 
+      localStorage.getItem('token') == null || 
+      localStorage.getItem('token') == undefined) {
+    return <Navigate to="/login" replace={true} />;
+  }
 
   useEffect(() => {
     const handler = (e:any) => {
@@ -28,8 +36,8 @@ const PostEditor: React.FC = () => {
             }}
           />
           <ApiCall 
-            url="https://blogapi.elvisbrevi.com/posts/create" 
-            method="POST" 
+            url="https://blogapi.elvisbrevi.com/posts?limit=100" 
+            method="GET" 
             data={{ title: 'test', content: 'test', date: '01-01-01' }} 
             render={({ response, error, loading, callApi }) => {
               if (loading) {

@@ -2,10 +2,17 @@ import { useState } from 'react';
 import axios, { AxiosResponse } from 'axios';
 
 interface Props {
-  url: string;
-  method: string;
-  data?: any;
-  render: (params: { response: AxiosResponse | null, error: Error | null, loading: boolean, callApi: () => Promise<void> }) => JSX.Element;
+  url     : string;
+  method  : string;
+  data?   : any;
+  render  : (
+    params  : { 
+      response  : AxiosResponse | null, 
+      error     : Error | null, 
+      loading   : boolean, 
+      callApi   : () => Promise<void> 
+    }
+  ) => JSX.Element;
 }
 
 function ApiCall({ url, method, data, render }: Props) {
@@ -15,7 +22,9 @@ function ApiCall({ url, method, data, render }: Props) {
   const [loading, setLoading] = useState(false);
 
   const callApi = async () => {
+
     setLoading(true);
+    
     try {
 
         const config = {
